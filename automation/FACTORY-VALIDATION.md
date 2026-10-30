@@ -6,7 +6,7 @@ Se probó el importador de esta rama con un maestro **H.264/AAC** generado media
 
 El editor exportó un vídeo **720×1280**, con audio y **30,002133 s**, en unos **30,5 s**. En el Chromium aislado de pruebas produjo VP9/Opus; una copia convertida localmente a H.264/yuv420p + AAC/48 kHz con faststart pasó la auditoría y decodificación completa (30,075632 s). No se afirma que el exportador estándar entregue H.264 en todos los navegadores.
 
-La prueba usa imágenes/etiquetas y un tono **sintéticos**, no voz de AI Studio. No certifica selección narrativa, encuadre de sujetos reales o sincronización acústica. El Short real solicitado sigue pendiente del audio y los originales descargados de Flow/Viral DNA.
+Esta prueba anterior usa imágenes/etiquetas y un tono **sintéticos**, no voz de AI Studio. La nueva integración con imágenes reales de Flow y voz Mako/Flash TTS 3.8 se completó por separado: consultar `REAL-INTEGRATION.md`. La selección editorial autónoma y la aprobación subjetiva de la voz siguen pendientes.
 
 También pasaron las dos pruebas Node de contrato y el recorrido anterior entre los dos editores, incluido el rechazo de un hash incorrecto. Los navegadores de pruebas bloquearon las solicitudes externas.
 
