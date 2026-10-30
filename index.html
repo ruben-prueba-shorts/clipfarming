@@ -394,7 +394,7 @@ async function loadFile(file){
   const hadFile=!!state.file;state.controller=new AbortController();setBusy('loading');progress('Abriendo tu vídeo…','Leyendo duración, imagen y audio.',null);source.pause();
   try{
     if(state.url)URL.revokeObjectURL(state.url);for(const c of state.clips)if(c.thumb)URL.revokeObjectURL(c.thumb);
-    state.file=null;state.url=URL.createObjectURL(file);state.clips=[];state.active=null;state.cache={pauses:false,scenes:false};state.pauses=[];state.scenes=[];state.envelope=[];
+    state.factoryJobId=null;state.file=null;state.url=URL.createObjectURL(file);state.clips=[];state.active=null;state.cache={pauses:false,scenes:false};state.pauses=[];state.scenes=[];state.envelope=[];
     if(hadFile){state.cues=[];state.subtitleName='';updateSubtitleStatus()}
     const metadata=waitEvent(source,'loadedmetadata',state.controller.signal);source.src=state.url;source.load();await metadata;
     if(!finite(source.duration)||source.duration<.5)throw new Error('El vídeo no tiene una duración válida o es demasiado corto.');
@@ -603,7 +603,7 @@ function exportClipSrt(){const c=activeClip();if(!c||state.busy||!applyEdit())re
 const SETTING_IDS=['clipCount','targetDuration','flexibility','maxDuration','language','model','aiSource','globalText','textPosition','textColor','textSize','aspect','framing','resolution','fps','subtitleBackground','exportFormat','exportEngine'];
 function projectData(clips=state.clips){
   const settings=Object.fromEntries(SETTING_IDS.map(id=>[id,$(id).value]));settings.mode=mode();settings.strategy=strategy();settings.burnSubs=$('burnSubs').checked;settings.detectScenes=$('detectScenes').checked;settings.detectPauses=$('detectPauses').checked;
-  return {format:'corta-studio/v1',video:{name:state.file?.name,size:state.file?.size,duration:state.duration},settings,subtitleName:state.subtitleName,cues:state.cues,clips:clips.map(({thumb,rating,...rest})=>rest)};
+  return {format:'corta-studio/v1',factoryJobId:state.factoryJobId||null,video:{name:state.file?.name,size:state.file?.size,duration:state.duration},settings,subtitleName:state.subtitleName,cues:state.cues,clips:clips.map(({thumb,rating,...rest})=>rest)};
 }
 function saveProject(){if(!state.file||state.busy||!applyEdit())return;addDownload(new Blob([JSON.stringify(projectData(),null,2)],{type:'application/json'}),safeName(state.file.name)+'_proyecto_corta.json');toast('Proyecto guardado. El vídeo y la clave no se incluyen.')}
 async function importProject(file){
@@ -617,7 +617,7 @@ async function importProject(file){
     for(const id of SETTING_IDS){const input=$(id),value=p.settings?.[id];if(value===undefined)continue;if(input.tagName==='SELECT'){if([...input.options].some(o=>o.value===String(value)))input.value=String(value)}else if(input.type==='range'||input.type==='number'){const n=Number(value);if(finite(n)&&n>=Number(input.min)&&n<=Number(input.max))input.value=String(n)}else input.value=String(value).slice(0,id==='globalText'?240:100)}
     for(const [name,allowed]of [['mode',['ai','local','split']],['strategy',['custom','recommend']]]){if(allowed.includes(p.settings?.[name]))document.querySelector(`input[name="${name}"][value="${p.settings[name]}"]`).checked=true}
     for(const id of ['burnSubs','detectScenes','detectPauses'])if(typeof p.settings?.[id]==='boolean')$(id).checked=p.settings[id];$('cloudConsent').checked=false;
-    for(const c of state.clips)if(c.thumb)URL.revokeObjectURL(c.thumb);state.clips=clips;state.active=null;state.cues=cues;state.subtitleName=cleanText(p.subtitleName).slice(0,200);updateSubtitleStatus();updateModes();renderClips();$('resultNotice').textContent='Proyecto recuperado. Se restauraron los cortes, el texto y los subtítulos. La clave de IA no forma parte del proyecto.';$('resultNotice').classList.remove('hidden');if(clips.length)await selectClip(clips[0].id);toast('Proyecto abierto. Puedes continuar la edición.');
+    for(const c of state.clips)if(c.thumb)URL.revokeObjectURL(c.thumb);state.clips=clips;state.factoryJobId=typeof p.factoryJobId==='string'?p.factoryJobId.slice(0,80):null;state.active=null;state.cues=cues;state.subtitleName=cleanText(p.subtitleName).slice(0,200);updateSubtitleStatus();updateModes();renderClips();$('resultNotice').textContent='Proyecto recuperado. Se restauraron los cortes, el texto y los subtítulos. La clave de IA no forma parte del proyecto.';$('resultNotice').classList.remove('hidden');if(clips.length)await selectClip(clips[0].id);toast('Proyecto abierto. Puedes continuar la edición.');
   }catch(e){banner(e instanceof SyntaxError?'El archivo no contiene JSON válido.':e.message)}finally{$('importProjectFile').value=''}
 }
 // Motor de exportación acelerada (FFmpeg WebAssembly). Se carga bajo demanda y se mantiene en memoria.
@@ -801,5 +801,8 @@ window.addEventListener('beforeunload',e=>{if(state.busy){e.preventDefault();e.r
 const originalSetBusy=setBusy;setBusy=function(kind){originalSetBusy(kind);$('cancelBtn').disabled=false};
 updateModes();updateFormats();refreshPreview();
 </script>
+<script src="./automation/media-contract.js"></script>
+<script src="./automation/import-autovideo.js"></script>
 </body>
 </html>
+
