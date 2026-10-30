@@ -1,5 +1,11 @@
 # Primer Short con material real — 30 de octubre de 2026
 
+El orquestador central de AutoVideo puede utilizar ahora `tools/local_shorts.py` para seleccionar y exportar sin navegador, usando los mismos selectores locales que este editor. El código común vive en `automation/local-cuts.js`; no se duplicó el algoritmo. También acepta un plan editorial del guion con intervalos de escenas alineadas, sin solicitar Gemini.
+
+La continuación reutilizó el maestro real existente de Mako/Flow y produjo un nuevo Short local H.264/AAC de **25,807479 s**, con carpeta completa de entrega. El proyecto y el maestro copiados se importaron de nuevo en la interfaz del editor, comprobando identidad, 25 cues y restauración de cortes. Se probaron además tres Shorts de escenas completas en un encargo sintético conectado. La selección local es heurística o procede del plan editorial; no se presenta como comprensión semántica garantizada ni predicción viral. Todos los resultados quedan para revisión.
+
+Detalle: [Orquestador](https://github.com/ruben-prueba-shorts/autovideostudio/blob/fix/flow-images-project-persistence/automation/ORCHESTRATOR.md) y [resultados medidos](https://github.com/ruben-prueba-shorts/autovideostudio/blob/fix/flow-images-project-persistence/automation/validation/orchestrator-results.json). No se repitieron generaciones ni pruebas largas.
+
 El PR #2 sigue en borrador, sin fusión ni despliegue. Se importó en esta rama el MP4 **H.264/AAC** limpio de AutoVideo PR #3 y el JSON generado para **ese mismo archivo**, con hash/tamaño/duración coincidentes.
 
 El material procede de tres imágenes existentes de Flow, prompts **102 → 110 → 97**, y **una sola narración gratuita autorizada** de **Mako / Gemini 3.8 Flash TTS**. La voz tiene 25,8 segundos. ClipFarming no solicitó una voz ni ejecutó Gemini: importación, subtítulos y exportación fueron locales en Chromium aislado.
