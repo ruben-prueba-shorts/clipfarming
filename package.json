@@ -1,0 +1,1 @@
+{"name":"clipfarming-integration-tests","private":true,"scripts":{"test":"node --test tests/*.test.cjs"}}
